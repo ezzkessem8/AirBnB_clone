@@ -83,6 +83,18 @@ class HBNBCommand(cmd.Cmd):
         except Exception as e:
             print(e)
 
+    def do_count(self, arg):
+        """Retrieve the number of instances of a class."""
+        arg_list = arg.split()
+        if not arg_list:
+            print("** class name missing **")
+            return
+        try:
+            count = len([obj for obj in BaseModel.all() if obj.__class__.__name__ == arg_list[0]])
+            print(count)
+        except Exception as e:
+            print(e)
+
     def do_update(self, arg):
         """Updates an instance based on the class name and id."""
         if not arg:
@@ -107,6 +119,72 @@ class HBNBCommand(cmd.Cmd):
         except Exception as e:
             print(e)
 
+    def do_show(self, arg):
+        """Retrieve an instance based on its ID."""
+        arg_list = arg.split()
+        if not arg_list:
+            print("** class name missing **")
+            return
+        try:
+            key = "{}.{}".format(arg_list[0], arg_list[1])
+            print(models.storage.all().get(key))
+        except Exception as e:
+            print(e)
+
+    def do_destroy(self, arg):
+        """Destroy an instance based on its ID."""
+        arg_list = arg.split()
+        if not arg_list:
+            print("** class name missing **")
+            return
+        try:
+            key = "{}.{}".format(arg_list[0], arg_list[1])
+            del models.storage.all()[key]
+            models.storage.save()
+        except Exception as e:
+            print(e)
+
+    def do_update(self, arg):
+        """Update an instance based on its ID."""
+        arg_list = arg.split()
+        if not arg_list:
+            print("** class name missing **")
+            return
+        try:
+            key = "{}.{}".format(arg_list[0], arg_list[1])
+            obj_dict = models.storage.all()
+            obj_instance = obj_dict[key]
+            if len(arg_list) < 3:
+                print("** attribute name missing **")
+                return
+            if len(arg_list) < 4:
+                print("** value missing **")
+                return
+            setattr(obj_instance, arg_list[2], arg_list[3].strip('"'))
+            obj_instance.save()
+        except Exception as e:
+            print(e)
+
+    def do_update_dict(self, arg):
+        """Update an instance based on its ID with a dictionary."""
+        arg_list = arg.split()
+        if not arg_list:
+            print("** class name missing **")
+            return
+        try:
+            key = "{}.{}".format(arg_list[0], arg_list[1])
+            obj_dict = models.storage.all()
+            obj_instance = obj_dict[key]
+            if len(arg_list) < 3:
+                print("** dictionary missing **")
+                return
+            new_dict = eval(arg_list[2])
+            for k, v in new_dict.items():
+                setattr(obj_instance, k, v)
+            obj_instance.save()
+        except Exception as e:
+            print(e)
+
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
-            
+                
